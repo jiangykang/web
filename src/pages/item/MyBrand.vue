@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <v-btn color="primary">新增</v-btn>
+      <v-btn color="primary" @click="addBrand">新增品牌</v-btn>
       <!--      空间隔离组件-->
       <v-spacer />
       <v-text-field label="输入关键字搜索" v-model="search" append-icon="search" hide-details>
@@ -33,10 +33,31 @@
         </td>
       </template>
     </v-data-table>
+
+    <!--  弹出的对话框-->
+    <v-dialog max-width="500" v-model="show" persistent>
+      <v-card>
+        <!--      对话框的标题-->
+        <v-toolbar dense dark color="primary">
+          <v-toolbar-title>新增品牌</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="closeWindow"><v-icon>close</v-icon></v-btn>
+        </v-toolbar>
+        <!--      对话框的内容，表单-->
+        <v-card-text class="px-5">
+          我是表单
+          <MyBrandForm></MyBrandForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
   </v-card>
+
+
 </template>
 
 <script>
+  import MyBrandForm from "./MyBrandForm";
     export default {
         name: "MyBrand",
       data() {
@@ -52,8 +73,12 @@
             {text: 'LOGO', align: 'center', sortable: false, value: 'image'},
             {text: '首字母', align: 'center', value: 'letter', sortable: true,},
             {text: '操作', align: 'center', value: 'id', sortable: false}
-          ]
+          ],
+          show: false, //控制对话框的显示
         }
+      },
+      components: {
+        MyBrandForm
       },
       mounted(){ // 渲染后执行
         // 查询数据
@@ -62,12 +87,53 @@
       methods: {
         getDataFromServer() { // 从服务的加载数据的方法。
           // 伪造假数据
-          this.brands = [
-            {id: 1, name: '三星', image: '123', letter: 'S'},
-            {id: 1, name: '三星', image: '123', letter: 'S'},
-            {id: 1, name: '三星', image: '321', letter: 'S'},
-          ];
+          // this.brands = [
+          //   {id: 1, name: '三星', image: '123', letter: 'S'},
+          //   {id: 1, name: '三星', image: '123', letter: 'S'},
+          //   {id: 1, name: '三星', image: '321', letter: 'S'},
+          // ];
+
+          //发起请求
+          this.$http.get("item/brand/page",{
+            params:{
+              key: this.search, // 搜索条件
+              page: this.pagination.page,// 当前页
+              rows: this.pagination.rowsPerPage,// 每页大小
+              sortBy: this.pagination.sortBy,// 排序字段
+              desc: this.pagination.descending// 是否降序
+            }
+          })
+          .then(resp => {
+            // 将得到的数据赋值给本地属性
+            this.brands = resp.data.items;
+            this.totalBrands = resp.data.total;
+            // 完成赋值后，把加载状态赋值为false
+            this.loading = false;
+            console.log(resp)
+          })
+
+        },
+        addBrand() {
+          //控制弹窗可见
+          this.show=true;
+        },
+        closeWindow(){
+          //关闭窗口
+          this.show=false;
         }
+      },
+      watch:{
+          pagination:{
+            deep:true,
+            handler() {
+              this.getDataFromServer();
+            },
+            search:{
+              handler() {
+                this.getDataFromServer();
+              }
+            }
+          }
       }
     }
 </script>

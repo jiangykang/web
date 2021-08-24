@@ -3,8 +3,8 @@
     <v-list-tile
       @click="toggle" class="level1 py-0 my-0" :class="{'selected':isSelected}">
       <v-list-tile-avatar class="px-1">
-        <v-icon v-if="model.isParent">{{open ? 'folder_open' : 'folder'}}</v-icon>
-        <v-icon v-if="!model.isParent">insert_drive_file</v-icon>
+        <v-icon v-if="model.parent">{{open ? 'folder_open' : 'folder'}}</v-icon>
+        <v-icon v-if="!model.parent">insert_drive_file</v-icon>
       </v-list-tile-avatar>
       <v-list-tile-content>
         <v-list-tile-title v-show="!beginEdit">
@@ -115,12 +115,17 @@
         // 切换开闭状态
         this.open = !this.open;
         // 如果已经是叶子节点,或者自己是关闭的，或者自己已经有儿子了，结束
-        if (!this.model.isParent || this.isFolder || !this.open) {
+        // if (!this.model.isParent || this.isFolder || !this.open) {
+        //   return;
+        // }
+        //如果是子节点，便不再查询后台数据
+        if (this.model.parent==false){
           return;
         }
         // 展开后查询子节点
         this.$http.get(this.url, {params: {pid: this.model.id}})
           .then(resp => {
+
           Vue.set(this.model, 'children', resp.data);
           // 封装当前节点的路径
           this.model.children.forEach(n => {
@@ -131,21 +136,23 @@
         }).catch( e => {
           console.log(e);
         });
+
       },
       addChild: function () {
         let child = {
-          id: 0,
           name: '新的节点',
           parentId: this.model.id,
-          isParent: false,
+          parent: false,
           sort:this.model.children? this.model.children.length + 1:1
         }
-        if (!this.model.isParent) {
+        //不是父节点
+        if (!this.model.parent) {
+          this.model.parent=true;
           Vue.set(this.model, 'children', [child]);
-          this.model.isParent = true;
+          this.model.parent = true;
           this.open = true;
           this.handleAdd(child);
-        } else {
+        } else { //当前节点存在子节点时，将新增的节点加入子节点集合
           if (!this.isFolder) {
             this.$http.get(this.url, {params: {pid: this.model.id}}).then(resp => {
               Vue.set(this.model, 'children', resp.data);
@@ -184,6 +191,7 @@
       },
       handleAdd(node) {
         this.$emit("handleAdd", node);
+        //todo 写入后台数据
       },
       handleDelete(id) {
         this.$emit("handleDelete", id);

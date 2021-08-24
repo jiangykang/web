@@ -13,11 +13,14 @@
 </template>
 
 <script>
+  import {treeData} from "../../mockDB";
+
   export default {
     name: "category",
     data() {
       return {
-        isEdit:true
+        isEdit:true,
+        treeData:treeData
       }
     },
     methods: {
@@ -32,7 +35,7 @@
         console.log("delete ... " + id)
       },
       handleClick(node) {
-        console.log(node)
+        console.log(node);
       }
     }
   };
