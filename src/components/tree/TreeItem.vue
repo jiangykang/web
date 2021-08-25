@@ -3,8 +3,8 @@
     <v-list-tile
       @click="toggle" class="level1 py-0 my-0" :class="{'selected':isSelected}">
       <v-list-tile-avatar class="px-1">
-        <v-icon v-if="model.parent">{{open ? 'folder_open' : 'folder'}}</v-icon>
-        <v-icon v-if="!model.parent">insert_drive_file</v-icon>
+        <v-icon v-if="model.isParent">{{open ? 'folder_open' : 'folder'}}</v-icon>
+        <v-icon v-if="!model.isParent">insert_drive_file</v-icon>
       </v-list-tile-avatar>
       <v-list-tile-content>
         <v-list-tile-title v-show="!beginEdit">
@@ -119,7 +119,7 @@
         //   return;
         // }
         //如果是子节点，便不再查询后台数据
-        if (this.model.parent==false){
+        if (this.model.isParent==false){
           return;
         }
         // 展开后查询子节点
@@ -142,11 +142,11 @@
         let child = {
           name: '新的节点',
           parentId: this.model.id,
-          parent: false,
+          isParent: false,
           sort:this.model.children? this.model.children.length + 1:1
         }
         //不是父节点
-        if (!this.model.parent) {
+        if (!this.model.isParent) {
           this.model.parent=true;
           Vue.set(this.model, 'children', [child]);
           this.model.parent = true;
@@ -173,7 +173,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.handleDelete(this.model.id);
+          this.handleDelete(this.model.id,this.model.parentId);
         }).catch(()=>{
           this.$message.info('已取消删除');
         })
@@ -182,22 +182,58 @@
       editChild() {
         this.beginEdit = true;
         this.$nextTick(() => this.$refs[this.model.id].focus());
+        console.log("调用编辑方法1----------------------------前-------")
       },
       afterEdit() {
-        if (this.model.beginEdit) {
+        if (!this.model.beginEdit) {
           this.beginEdit = false;
+          console.log("调用编辑方法----------------------------前-------")
           this.handleEdit(this.model.id, this.model.name);
+          console.log("调用编辑方法-----------------------------------")
         }
       },
       handleAdd(node) {
-        this.$emit("handleAdd", node);
+        // this.$emit("handleAdd", node);
         //todo 写入后台数据
+        this.$http.post("/item/category/add", node).then(resp => {
+          if (resp.data==1) {
+            console.log("新增节点后台处理成功");
+          }
+          else
+            console.log("新增节点后台处理失败！");
+
+        });
       },
-      handleDelete(id) {
+      handleDelete(id,parentId) {
         this.$emit("handleDelete", id);
+        //提交后台
+        let node = {
+          id:id,
+          parentId:parentId
+        }
+        this.$http.post("/item/category/delete",node).then(resp => {
+          if (resp.data==1) {
+            console.log("删除节点后台处理成功");
+          }
+          else
+            console.log("删除节点后台处理失败！");
+        })
       },
       handleEdit(id, name) {
         this.$emit("handleEdit", id, name)
+        //todo 提交后台
+        let node = {
+          id:id,
+          name:name
+        }
+        this.$http.post("/item/category/update", node).then(resp => {
+          if (resp.data==1) {
+            console.log("更新节点后台处理成功");
+          }
+          else
+            console.log("更新节点后台处理失败！");
+
+        });
       },
       handleClick(node) {
         this.$emit("handleClick", node);
