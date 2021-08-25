@@ -60,9 +60,12 @@
       handleEdit(id, name) {
         this.$emit("handleEdit", id, name)
       },
-      handleDelete(id) {
+      handleDelete(id,parentId) {
+        this.countSubNodeById(parentId,this.db);
         this.deleteById(id, this.db);
-        this.$emit("handleDelete", id);
+        console.log("this.db")
+        console.log(this.db)
+        this.$emit("handleDelete", id,parentId);
       },
       handleClick(node){
         this.$emit("handleClick", this.copyNodeInfo(node))
@@ -71,6 +74,7 @@
       deleteById(id, arr) {
         let src = arr || this.db;
         for (let i in src) {
+          console.log("deleteById开始执行了")
           let d = src[i];
           if (d.id === id) {
             src.splice(i, 1)
@@ -78,6 +82,34 @@
           }
           if (d.children && d.children.length > 0) {
             this.deleteById(id, d.children)
+          }
+        }
+      },
+      // 查找父节点存在几个子节点
+      countSubNodeById(id, arr) {
+        let src = arr || this.db;
+        let count = 0;
+        for (let i in src) {
+          console.log("countSubNodeById开始执行了")
+          let d = src[i];
+          if (d.parentId === id ) {
+            count++;
+            console.log("count是多少呢？");
+            console.log(count);
+          }
+          if (d.children && d.children.length > 0) {
+            this.countSubNodeById(id, d.children)
+          }
+        }
+        console.log(count);
+        if (count <= 1) {
+          for (let i in src) {
+            let d = src[i];
+            if (d.id === id) {
+              d.isParent=false;
+              src.splice(i, 1,d);
+              return;
+            }
           }
         }
       },

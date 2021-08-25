@@ -149,7 +149,7 @@
         if (!this.model.isParent) {
           this.model.parent=true;
           Vue.set(this.model, 'children', [child]);
-          this.model.parent = true;
+          this.model.isParent = true;
           this.open = true;
           this.handleAdd(child);
         } else { //当前节点存在子节点时，将新增的节点加入子节点集合
@@ -174,6 +174,8 @@
           type: 'warning'
         }).then(() => {
           this.handleDelete(this.model.id,this.model.parentId);
+          console.log("删除后的model")
+          console.log(this.model.children)
         }).catch(()=>{
           this.$message.info('已取消删除');
         })
@@ -193,31 +195,15 @@
         }
       },
       handleAdd(node) {
-        // this.$emit("handleAdd", node);
-        //todo 写入后台数据
-        this.$http.post("/item/category/add", node).then(resp => {
-          if (resp.data==1) {
-            console.log("新增节点后台处理成功");
-          }
-          else
-            console.log("新增节点后台处理失败！");
+        this.$emit("handleAdd", node);
 
-        });
+
+
       },
       handleDelete(id,parentId) {
-        this.$emit("handleDelete", id);
-        //提交后台
-        let node = {
-          id:id,
-          parentId:parentId
-        }
-        this.$http.post("/item/category/delete",node).then(resp => {
-          if (resp.data==1) {
-            console.log("删除节点后台处理成功");
-          }
-          else
-            console.log("删除节点后台处理失败！");
-        })
+        //this.$emit("handleDelete", id);
+
+        this.$emit("handleDelete", id,parentId);
       },
       handleEdit(id, name) {
         this.$emit("handleEdit", id, name)
