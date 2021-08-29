@@ -15,8 +15,9 @@
 
 <script>
   import TreeItem from './TreeItem';
-
+  let count=0;
   export default {
+
     name: "vTree",
     props: {
       url: String,
@@ -62,7 +63,9 @@
       },
       handleDelete(id,parentId) {
         this.countSubNodeById(parentId,this.db);
+        this.updateParent(count,parentId,this.db);
         this.deleteById(id, this.db);
+        count=0;
         console.log("this.db")
         console.log(this.db)
         this.$emit("handleDelete", id,parentId);
@@ -88,11 +91,10 @@
       // 查找父节点存在几个子节点
       countSubNodeById(id, arr) {
         let src = arr || this.db;
-        let count = 0;
         for (let i in src) {
           console.log("countSubNodeById开始执行了")
           let d = src[i];
-          if (d.parentId === id ) {
+          if (d.parentId === id) {
             count++;
             console.log("count是多少呢？");
             console.log(count);
@@ -101,14 +103,20 @@
             this.countSubNodeById(id, d.children)
           }
         }
-        console.log(count);
-        if (count <= 1) {
+      },
+      updateParent(count,id,arr) {
+        console.log("传入的count"+count);
+        if (count == 1) {
+          let src = arr || this.db;
           for (let i in src) {
             let d = src[i];
             if (d.id === id) {
               d.isParent=false;
               src.splice(i, 1,d);
               return;
+            }
+            if (d.children && d.children.length > 0) {
+              this.updateParent(count,id, d.children)
             }
           }
         }

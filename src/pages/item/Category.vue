@@ -27,15 +27,7 @@
       handleAdd(node) {
         console.log("add .... ");
         console.log(node);
-        //todo 写入后台数据
-        this.$http.post("/item/category/add", node).then(resp => {
-          if (resp.data==1) {
-            console.log("新增节点后台处理成功");
-          }
-          else
-            console.log("新增节点后台处理失败！");
 
-        });
       },
       handleEdit(id, name) {
         console.log("edit... id: " + id + ", name: " + name)

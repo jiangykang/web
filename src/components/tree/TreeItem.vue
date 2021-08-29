@@ -97,7 +97,7 @@
         // 当前项被选中
         this.isSelected = true;
         // 保存当前选中项
-        this.nodes.selected = this
+        this.nodes.selected = this;
 
         // 客户自己的点击事件回调
         this.handleClick(this.model);
@@ -138,33 +138,36 @@
         });
 
       },
-      addChild: function () {
+      addChild: async function () {
         let child = {
+          id:null,
           name: '新的节点',
           parentId: this.model.id,
           isParent: false,
           sort:this.model.children? this.model.children.length + 1:1
-        }
+        };
+        let idBySelect = await this.handleAdd(child);
+        console.log("返回后的idBySelect"+idBySelect);
+        child.id=idBySelect;
         //不是父节点
         if (!this.model.isParent) {
           this.model.parent=true;
+
           Vue.set(this.model, 'children', [child]);
           this.model.isParent = true;
           this.open = true;
-          this.handleAdd(child);
+
         } else { //当前节点存在子节点时，将新增的节点加入子节点集合
-          if (!this.isFolder) {
+          // if (!this.isFolder) {
             this.$http.get(this.url, {params: {pid: this.model.id}}).then(resp => {
               Vue.set(this.model, 'children', resp.data);
-              this.model.children.push(child);
+              //this.model.children.push(child);
               this.open = true;
-              this.handleAdd(child);
             });
-          } else {
-            this.model.children.push(child);
-            this.open = true;
-            this.handleAdd(child);
-          }
+          // } else {
+          //   this.model.children.push(child);
+          //   this.open = true;
+          // }
         }
       },
       deleteChild: function () {
@@ -173,7 +176,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.handleDelete(this.model.id,this.model.parentId);
+          this.handleDelete(this.model.id,this.model.parentId,this.model);
           console.log("删除后的model")
           console.log(this.model.children)
         }).catch(()=>{
@@ -194,11 +197,27 @@
           console.log("调用编辑方法-----------------------------------")
         }
       },
-      handleAdd(node) {
-        this.$emit("handleAdd", node);
+      async handleAdd(node) {
+        let idBySelect;
+        //return this.$emit("handleAdd", node);
+        //todo 写入后台数据
+        await this.$http.post("/item/category/add", node).then(resp => {
+          idBySelect = resp.data;
+          if (resp.data == -1) {
+            console.log("新增节点后台处理失败！");
+          }
+          else {
+            console.log("新增节点后台处理成功");
+            console.log(resp.data);
 
+          }
+          // console.log("返回前的idBySelect"+idBySelect);
+          // return idBySelect;
 
+        });
 
+        console.log("返回前的idBySelect"+idBySelect);
+        return idBySelect;
       },
       handleDelete(id,parentId) {
         //this.$emit("handleDelete", id);
@@ -206,7 +225,7 @@
         this.$emit("handleDelete", id,parentId);
       },
       handleEdit(id, name) {
-        this.$emit("handleEdit", id, name)
+        this.$emit("handleEdit", id, name);
         //todo 提交后台
         let node = {
           id:id,
