@@ -61,30 +61,34 @@
       handleEdit(id, name) {
         this.$emit("handleEdit", id, name)
       },
-      handleDelete(id,parentId) {
+      handleDelete(id,parentId,sort) {
         this.countSubNodeById(parentId,this.db);
         this.updateParent(count,parentId,this.db);
-        this.deleteById(id, this.db);
+        this.deleteById(id, parentId ,sort,this.db);
         count=0;
         console.log("this.db")
         console.log(this.db)
-        this.$emit("handleDelete", id,parentId);
+        this.$emit("handleDelete", id,parentId,sort);
       },
       handleClick(node){
         this.$emit("handleClick", this.copyNodeInfo(node))
       },
       // 根据id删除
-      deleteById(id, arr) {
+      deleteById(id, parentId,sort,arr) {
         let src = arr || this.db;
-        for (let i in src) {
-          console.log("deleteById开始执行了")
+        for (let i=0;i<src.length;i++) {
           let d = src[i];
+          if (d.parentId === parentId && d.sort > sort) {
+            d.sort = d.sort - 1;
+            src.splice(i, 1,d);
+          }
           if (d.id === id) {
-            src.splice(i, 1)
-            return;
+            src.splice(i, 1);
+            i--;
+
           }
           if (d.children && d.children.length > 0) {
-            this.deleteById(id, d.children)
+            this.deleteById(id, parentId, sort,d.children)
           }
         }
       },

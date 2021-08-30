@@ -176,7 +176,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.handleDelete(this.model.id,this.model.parentId,this.model);
+          this.handleDelete(this.model.id,this.model.parentId,this.model.sort);
           console.log("删除后的model")
           console.log(this.model.children)
         }).catch(()=>{
@@ -219,10 +219,10 @@
         console.log("返回前的idBySelect"+idBySelect);
         return idBySelect;
       },
-      handleDelete(id,parentId) {
+      handleDelete(id,parentId,sort) {
         //this.$emit("handleDelete", id);
 
-        this.$emit("handleDelete", id,parentId);
+        this.$emit("handleDelete", id,parentId,sort);
       },
       handleEdit(id, name) {
         this.$emit("handleEdit", id, name);

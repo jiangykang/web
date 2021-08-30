@@ -32,11 +32,12 @@
       handleEdit(id, name) {
         console.log("edit... id: " + id + ", name: " + name)
       },
-      handleDelete(id,parentId) {
+      handleDelete(id,parentId,sort) {
         //提交后台
         let node = {
           id:id,
-          parentId:parentId
+          parentId:parentId,
+          sort:sort
         }
         this.$http.post("/item/category/delete",node).then(resp => {
           if (resp.data==1) {
