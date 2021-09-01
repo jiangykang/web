@@ -16,7 +16,7 @@
       <v-flex>
         <v-upload
           v-model="brand.image"
-          url="/upload"
+          url="/upload/image"
           :multiple="false"
           :pic-width="250"
           :pic-height="90"
@@ -53,6 +53,9 @@
             ]
           }
         },
+      created() {
+          console.log(this.$qs);
+      },
       methods:{
         submit(){
           // 1、表单校验
@@ -64,8 +67,10 @@
             // 4、将字母都处理为大写
             params.letter = letter.toUpperCase();
             // 5、将数据提交到后台
-            this.$http.post('/item/brand', params)
+            this.$http.post('/item/brand', this.$qs.stringify(params))
               .then(() => {
+                //关闭窗口
+                this.$emit("close");
                 // 6、弹出提示
                 this.$message.success("保存成功！");
               })

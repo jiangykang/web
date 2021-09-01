@@ -46,7 +46,7 @@
         <!--      对话框的内容，表单-->
         <v-card-text class="px-5">
           我是表单
-          <MyBrandForm></MyBrandForm>
+          <MyBrandForm @close="closeWindow"></MyBrandForm>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -109,7 +109,6 @@
             this.totalBrands = resp.data.total;
             // 完成赋值后，把加载状态赋值为false
             this.loading = false;
-            console.log(resp)
           })
 
         },
@@ -120,6 +119,8 @@
         closeWindow(){
           //关闭窗口
           this.show=false;
+          //重新加载数据
+          this.getDataFromServer();
         }
       },
       watch:{
