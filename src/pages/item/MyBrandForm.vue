@@ -34,6 +34,11 @@
 <script>
     export default {
         name: "MyBrandForm",
+        props: {
+          oldBrand:{
+            type:Object
+          }
+        },
         data() {
           return {
             valid:false, //表单校验结果标记
@@ -85,6 +90,23 @@
           // 需要手动清空商品分类
           this.categories = [];
         }
+      },
+      watch:{
+          oldBrand:{ //监控oldBrand变化
+            handler(val) {
+              if (val) {
+                this.brand = Object.deepCopy(val);
+              }else  {
+                this.brand = {
+                  name:'',
+                  letter:'',
+                  image:'',
+                  categories:[],
+                }
+              }
+            },
+            deep: true
+          }
       }
     }
 </script>
