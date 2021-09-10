@@ -117,13 +117,22 @@
           this.title="新增品牌" ;
           //控制弹窗可见
           this.show=true;
+          //清空数据
+          this.oldBrand = null;
         },
         editBrand(oldBrand) {
           this.title="编辑品牌" ;
-          //控制弹窗可见
-          this.show=true;
-          //获取要编辑的brand
-          this.oldBrand=oldBrand;
+
+          //根据品牌信息查询商品分类
+          this.$http.get("item/category/bid/" + oldBrand.id)
+          .then(({data}) => {
+            //控制弹窗可见
+            this.show=true;
+            //获取要编辑的brand
+            this.oldBrand=oldBrand;
+            //回显商品分类
+            this.oldBrand.categories = data;
+          })
 
         },
         closeWindow(){
@@ -133,7 +142,7 @@
           this.getDataFromServer();
           console.log(this.$refs);
           // 清空子组件数据
-          this.$refs.newForm.$refs.myBrandForm.reset();
+          //this.$refs.newForm.$refs.myBrandForm.reset();
 
         }
       },
