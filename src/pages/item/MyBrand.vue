@@ -119,6 +119,8 @@
           this.show=true;
           //清空数据
           this.oldBrand = null;
+          // 清空子组件数据
+          this.$refs.newForm.$refs.myBrandForm.reset();
         },
         editBrand(oldBrand) {
           this.title="编辑品牌" ;
@@ -142,7 +144,7 @@
           this.getDataFromServer();
           console.log(this.$refs);
           // 清空子组件数据
-          //this.$refs.newForm.$refs.myBrandForm.reset();
+          this.$refs.newForm.$refs.myBrandForm.reset();
 
         }
       },
