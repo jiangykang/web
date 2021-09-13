@@ -37,12 +37,17 @@
         props: {
           oldBrand:{
             type:Object
+          },
+          isEdit: {
+            type: Boolean,
+            default: false
           }
         },
         data() {
           return {
             valid:false, //表单校验结果标记
             brand:{
+              id:'',  //商品Id
               name:'',//商品名称
               letter:'',//商品首字母
               image:'',//商品logo
@@ -69,19 +74,35 @@
             const {categories ,letter ,...params} = this.brand;
             // 3、数据库中只要保存分类的id即可，因此我们对categories的值进行处理,只保留id，并转为字符串
             params.cids = categories.map(c => c.id).join(",");
+            params.id=null;
             // 4、将字母都处理为大写
             params.letter = letter.toUpperCase();
+            console.log(params);
             // 5、将数据提交到后台
-            this.$http.post('/item/brand', this.$qs.stringify(params))
+            if (!this.isEdit) {
+              this.$http.post('/item/brand', this.$qs.stringify(params))
+                .then(() => {
+                  //关闭窗口
+                  this.$emit("close");
+                  // 6、弹出提示
+                  this.$message.success("保存成功！");
+                })
+                .catch(() => {
+                  this.$message.error("保存失败！");
+                });
+            }
+            else {
+              console.log(this.brand);
+              this.$http.post('/item/brand/update', this.$qs.stringify(params))
               .then(() => {
                 //关闭窗口
                 this.$emit("close");
-                // 6、弹出提示
-                this.$message.success("保存成功！");
+                this.$message.success("更新成功！");
               })
               .catch(() => {
-                this.$message.error("保存失败！");
-              });
+                this.$message.error("更新失败！")
+              })
+            }
           }
         },
         clear(){
@@ -98,6 +119,7 @@
                 this.brand = Object.deepCopy(val);
               }else  {
                 this.brand = {
+                  id:null,
                   name:'',
                   letter:'',
                   image:'',

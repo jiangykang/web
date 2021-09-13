@@ -45,7 +45,7 @@
         </v-toolbar>
         <!--      对话框的内容，表单-->
         <v-card-text class="px-5">
-          <MyBrandForm ref="newForm" @close="closeWindow" :oldBrand="oldBrand"></MyBrandForm>
+          <MyBrandForm ref="newForm" @close="closeWindow" :oldBrand="oldBrand" :isEdit="isEdit"></MyBrandForm>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -75,7 +75,8 @@
             {text: '操作', align: 'center', value: 'id', sortable: false}
           ],
           show: false, //控制对话框的显示
-          oldBrand: {} //即将被编辑的品牌数据
+          oldBrand: {}, //即将被编辑的品牌数据
+          isEdit:false //是否是编辑状态
         }
       },
       components: {
@@ -115,6 +116,7 @@
         },
         addBrand() {
           this.title="新增品牌" ;
+          this.isEdit=false;
           //控制弹窗可见
           this.show=true;
           //清空数据
@@ -124,7 +126,7 @@
         },
         editBrand(oldBrand) {
           this.title="编辑品牌" ;
-
+          this.isEdit=true;
           //根据品牌信息查询商品分类
           this.$http.get("item/category/bid/" + oldBrand.id)
           .then(({data}) => {
@@ -148,18 +150,19 @@
 
         }
       },
-      watch:{
-          pagination:{
-            deep:true,
-            handler() {
-              this.getDataFromServer();
-            },
-            search:{
-              handler() {
-                this.getDataFromServer();
-              }
-            }
+      watch: {
+        pagination: { // 监视pagination属性的变化
+          deep: true, // deep为true，会监视pagination的属性及属性中的对象属性变化
+          handler() {
+            // 变化后的回调函数，这里我们再次调用getDataFromServer即可
+            this.getDataFromServer();
           }
+        },
+        search: { // 监视搜索字段
+          handler() {
+            this.getDataFromServer();
+          }
+        }
       }
     }
 </script>
