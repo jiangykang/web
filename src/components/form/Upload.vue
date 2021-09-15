@@ -93,6 +93,7 @@
         }
       },
       handleRemove(file, fileList) {
+        debugger;
         this.fileList = fileList;
         this.$emit("input", fileList.map(f => f.response))
       },
@@ -101,15 +102,17 @@
         this.show = true;
       },
       removeSingle() {
+        debugger;
         this.dialogImageUrl = "";
         this.$refs.singleUpload.clearFiles();
+        this.$emit("clearImage");
       }
     },
     watch: {
       value:{
         deep:true,
         handler(val,oldVal){
-    
+
           if (this.multiple) {
             this.fileList = val.map(f => {
               return {response: f,url:f}

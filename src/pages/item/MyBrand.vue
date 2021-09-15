@@ -29,7 +29,7 @@
         <td class="text-xs-center">{{ props.item.letter }}</td>
         <td class="justify-center layout">
           <v-btn color="info" @click="editBrand(props.item)">编辑</v-btn>
-          <v-btn color="warning">删除</v-btn>
+          <v-btn color="warning" @click="deleteBrand(props.item)">删除</v-btn>
         </td>
       </template>
     </v-data-table>
@@ -137,7 +137,28 @@
             //回显商品分类
             this.oldBrand.categories = data;
           })
-
+        },
+        deleteBrand(oldBrand) {
+          this.$message.confirm('此操作将永久删除数据，是否继续?', '提示', {
+            confirmButtonText: '确定删除',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.handleDelete(oldBrand);
+          }).catch(()=>{
+            this.$message.info('已取消删除');
+          })
+        },
+        handleDelete(oldBrand) {
+          this.$http.post("item/brand/delete", oldBrand)
+            .then(({data}) => {
+              if (data == 1) {
+                console.log("删除品牌后台处理成功");
+                this.getDataFromServer();
+              }
+              else
+                console.log("删除品牌后台处理失败");
+            })
         },
         closeWindow(){
           //关闭窗口

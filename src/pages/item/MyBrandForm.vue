@@ -20,6 +20,7 @@
           :multiple="false"
           :pic-width="250"
           :pic-height="90"
+          @clearImage="clearImage"
         />
       </v-flex>
     </v-layout>
@@ -74,12 +75,12 @@
             const {categories ,letter ,...params} = this.brand;
             // 3、数据库中只要保存分类的id即可，因此我们对categories的值进行处理,只保留id，并转为字符串
             params.cids = categories.map(c => c.id).join(",");
-            params.id=null;
             // 4、将字母都处理为大写
             params.letter = letter.toUpperCase();
             console.log(params);
             // 5、将数据提交到后台
             if (!this.isEdit) {
+              params.id=null;
               this.$http.post('/item/brand', this.$qs.stringify(params))
                 .then(() => {
                   //关闭窗口
@@ -110,6 +111,9 @@
           this.$refs.myBrandForm.reset();
           // 需要手动清空商品分类
           this.categories = [];
+        },
+        clearImage(){
+          this.brand.image=null;
         }
       },
       watch:{
