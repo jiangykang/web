@@ -67,7 +67,7 @@
         </v-toolbar>
         <!--对话框的内容，表单-->
         <v-card-text class="px-3" style="height: 600px">
-          <goods-form :oldGoods="oldGoods" :step="step" @close="closeWindow" :is-edit="isEdit" ref="goodsForm"/>
+          <goods-form ref="goodsParent" :oldGoods="oldGoods" :step="step" @close="closeWindow" :is-edit="isEdit" />
         </v-card-text>
         <!--底部按钮，用来操作步骤线-->
         <v-card-actions class="elevation-10">
@@ -153,6 +153,8 @@
         this.show = true;
         // 把oldBrand变为null
         this.oldGoods = {};
+        // 清空子组件数据
+        this.$refs.goodsParent.$refs.basic.reset();
       },
       async editGoods(oldGoods) {
         // 发起请求，查询商品详情和skus

@@ -1,5 +1,5 @@
 <template>
-  <v-stepper v-model="step">
+  <v-stepper v-model="step" ref="goodsForm">
     <v-stepper-header>
       <v-stepper-step :complete="step > 1" step="1">基本信息</v-stepper-step>
       <v-divider/>
