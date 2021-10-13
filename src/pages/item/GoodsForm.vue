@@ -1,5 +1,5 @@
 <template>
-  <v-stepper v-model="step" ref="goodsForm">
+  <v-stepper v-model="step">
     <v-stepper-header>
       <v-stepper-step :complete="step > 1" step="1">基本信息</v-stepper-step>
       <v-divider/>
@@ -40,7 +40,7 @@
                   :rules="[v => !!v || '品牌不能为空']"
                 >
                   <template slot="selection" slot-scope="data">
-                    <v-chip small>{{ data.item.name}}</v-chip>
+                    <v-chip small v-if="data.item.name">{{ data.item.name}}</v-chip>
                   </template>
                 </v-select>
               </v-flex>
